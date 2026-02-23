@@ -11,7 +11,6 @@ This lab continues using the simplified AmeriFlux-style dataset from the US-AMS 
 What is AmeriFlux?
 
 AmeriFlux is a network of ecosystem observation sites (primarily eddy covariance towers) that measure exchanges of:  
-
 	* carbon dioxide (CO₂),
 	* water vapor,
 	* energy,
