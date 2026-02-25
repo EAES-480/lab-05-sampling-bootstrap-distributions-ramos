@@ -371,7 +371,7 @@ Write code to:
 - compute bootstrap SD
 - plot the bootstrap distribution
 
-```{r bootstrap_mean, echo=TRUE, eval=FALSE}
+```{r bootstrap_mean, echo=TRUE, eval=T}
 set.seed(480)
 
 # TODO: choose settings
@@ -396,7 +396,7 @@ tibble(
 )
 ```
 
-```{r plot_boot, echo=TRUE, eval=FALSE}
+```{r plot_boot, echo=TRUE, eval=T}
 # TODO: plot boot_means and mark the sample mean
 tibble(boot_means) %>%  
   ggplot(aes(boot_means)) +
@@ -404,7 +404,7 @@ tibble(boot_means) %>%
   geom_vline(xintercept = mean(boot_means), linetype = "dashed", linewidth = 1.1) +
   theme_classic(base_size = 18) +
   labs(
-    x = paste0("Sample mean of ", target_var),
+    x = paste0("Bootstrap mean of ", target_var),
     y = "Count",
     title = "Bootstrap distribution of the mean",
     subtitle = paste0("n = ", n_samp, "; B = ", B, " (dashed = population mean)")
@@ -434,7 +434,7 @@ We will focus on **soil water content (`swc`)**.
 
 ## Preparation (recommended)
 
-```{r part2_prep, echo=TRUE, eval=FALSE}
+```{r part2_prep, echo=TRUE, eval=T}
 # GOAL: Ensure df exists (loaded in Part I) and create a clean SWC population vector.
 
 swc_pop <- df$swc
@@ -456,35 +456,35 @@ tibble(
 
 **Task:** Draw a *simple random sample* of `n = 200` from the SWC population, then bootstrap the mean.
 
-```{r ex1_random_bootstrap, echo=TRUE, eval=FALSE}
+```{r ex1_random_bootstrap, echo=TRUE, eval=T}
 set.seed(480)
 
-n_samp <- ___
+n_samp <- 200
 B <- 4000
 
 # 1) Draw a random sample (no replacement) from the population vector
-swc_samp_random <- sample(___, size = n_samp, replace = FALSE)
+swc_samp_random <- sample(swc_pop, size = n_samp, replace = FALSE)
 
 # 2) Bootstrap the mean (resample WITH replacement from the sample)
 boot_means_random <- replicate(
   B,
-  mean(sample(swc_samp_random, size = ___, replace = TRUE))
+  mean(sample(swc_samp_random, size = n_samp, replace = TRUE))
 )
 
 # 3) Summarize
 tibble(
   pop_mean = pop_mean_swc,
-  sample_mean = mean(___),
-  boot_sd = sd(___)
+  sample_mean = mean(swc_samp_random),
+  boot_sd = sd(boot_means_random)
 )
 ```
 
-```{r ex1_plot_random_boot, echo=TRUE, eval=FALSE}
+```{r ex1_plot_random_boot, echo=TRUE, eval=T}
 # GOAL: Plot the bootstrap distribution and mark (i) sample mean and (ii) population mean.
 
 tibble(boot_mean = boot_means_random) %>%
   ggplot(aes(x = boot_mean)) +
-  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_histogram(bins = 20, alpha = 0.85) +
   geom_vline(xintercept = mean(swc_samp_random), linetype = "dashed", linewidth = 1.1) +
   geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
   theme_classic(base_size = 18) +
@@ -509,7 +509,7 @@ What does the bootstrap SD represent here?
 
 > This simulates a field campaign that only measured during summer.
 
-```{r ex2_summer_sample, echo=TRUE, eval=FALSE}
+```{r ex2_summer_sample, echo=TRUE, eval=T}
 # GOAL: Build a summer-only pool of SWC observations (Jun–Aug), then sample from that pool.
 
 # TODO: ensure df has a month column.
@@ -517,27 +517,27 @@ What does the bootstrap SD represent here?
 # HINT: month(date, label = TRUE, abbr = TRUE)
 
 df_summer <- df %>%
-  filter(___ %in% c("Jun", "Jul", "Aug")) %>%
-  filter(!is.na(___))
+  filter(month %in% c("Jun", "Jul", "Aug")) %>%
+  filter(!is.na(swc))
 
 swc_summer_pool <- df_summer$swc
 
 length(swc_summer_pool)
 ```
 
-```{r ex2_summer_bootstrap, echo=TRUE, eval=FALSE}
+```{r ex2_summer_bootstrap, echo=TRUE, eval=T}
 set.seed(480)
 
 n_samp <- 200
 B <- 4000
 
 # 1) Draw a summer-only sample
-swc_samp_summer <- sample(___, size = n_samp, replace = FALSE)
+swc_samp_summer <- sample(swc_summer_pool, size = n_samp, replace = FALSE)
 
 # 2) Bootstrap the mean from that sample
-boot_means_summer <- ___(
+boot_means_summer <- replicate(
   B,
-  mean(sample(___, size = n_samp, replace = TRUE))
+  mean(sample(swc_samp_summer, size = n_samp, replace = TRUE))
 )
 
 # 3) Summarize
@@ -549,12 +549,12 @@ tibble(
 )
 ```
 
-```{r ex2_plot_summer_boot, echo=TRUE, eval=FALSE}
+```{r ex2_plot_summer_boot, echo=TRUE, eval=T}
 # GOAL: Plot summer bootstrap and compare to population mean.
 
 tibble(boot_mean = boot_means_summer) %>%
   ggplot(aes(x = boot_mean)) +
-  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_histogram(bins = 50, alpha = 0.85) +
   geom_vline(xintercept = mean(swc_samp_summer), linetype = "dashed", linewidth = 1.1) +
   geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
   theme_classic(base_size = 18) +
@@ -588,9 +588,9 @@ k_per_month <- n_samp / 12
 
 # 1) Create a month-stratified sample from df
 df_strat <- df %>%
-  filter(!is.na(___)) %>%
-  group_by(___) %>%
-  slice_sample(n = ___) %>%
+  filter(!is.na(swc)) %>%
+  group_by(month) %>%
+  slice_sample(n = k_per_month) %>%
   ungroup()
 
 swc_samp_strat <- df_strat$swc
@@ -621,7 +621,7 @@ tibble(
 
 tibble(boot_mean = boot_means_strat) %>%
   ggplot(aes(x = boot_mean)) +
-  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_histogram(bins = 50, alpha = 0.85) +
   geom_vline(xintercept = mean(swc_samp_strat), linetype = "dashed", linewidth = 1.1) +
   geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
   theme_classic(base_size = 18) +
