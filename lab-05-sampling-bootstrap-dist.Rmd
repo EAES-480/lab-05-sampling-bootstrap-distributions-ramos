@@ -418,8 +418,237 @@ What is the bootstrap trying to approximate? When is bootstrap especially useful
 
 ---
 
+# Part II — Bootstrap under random vs non-random sampling (SWC)
+
+In Part I, you learned that the bootstrap approximates uncertainty **conditional on the sample you observed**.
+
+Now you will test a key warning:
+
+> Bootstrap can quantify *precision* even when the estimate is *biased*.
+
+We will focus on **soil water content (`swc`)**.
+
+- **Population**: all 2023 half-hour records (after removing `NA`)
+- **Sample**: one “field campaign” sample of size `n = 200`
+- **Bootstrap**: resample *within the sample* (with replacement) many times
+
+## Preparation (recommended)
+
+```{r part2_prep, echo=TRUE, eval=FALSE}
+# GOAL: Ensure df exists (loaded in Part I) and create a clean SWC population vector.
+
+swc_pop <- df$swc
+swc_pop <- swc_pop[!is.na(swc_pop)]
+
+pop_mean_swc <- mean(swc_pop)
+pop_sd_swc   <- sd(swc_pop)
+
+tibble(
+  pop_mean_swc = pop_mean_swc,
+  pop_sd_swc   = pop_sd_swc,
+  n_pop = length(swc_pop)
+)
+```
+
+---
+
+## Exercise 1 — Random sample → bootstrap distribution (baseline)
+
+**Task:** Draw a *simple random sample* of `n = 200` from the SWC population, then bootstrap the mean.
+
+```{r ex1_random_bootstrap, echo=TRUE, eval=FALSE}
+set.seed(480)
+
+n_samp <- ___
+B <- 4000
+
+# 1) Draw a random sample (no replacement) from the population vector
+swc_samp_random <- sample(___, size = n_samp, replace = FALSE)
+
+# 2) Bootstrap the mean (resample WITH replacement from the sample)
+boot_means_random <- replicate(
+  B,
+  mean(sample(swc_samp_random, size = ___, replace = TRUE))
+)
+
+# 3) Summarize
+tibble(
+  pop_mean = pop_mean_swc,
+  sample_mean = mean(___),
+  boot_sd = sd(___)
+)
+```
+
+```{r ex1_plot_random_boot, echo=TRUE, eval=FALSE}
+# GOAL: Plot the bootstrap distribution and mark (i) sample mean and (ii) population mean.
+
+tibble(boot_mean = boot_means_random) %>%
+  ggplot(aes(x = boot_mean)) +
+  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_vline(xintercept = mean(swc_samp_random), linetype = "dashed", linewidth = 1.1) +
+  geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
+  theme_classic(base_size = 18) +
+  labs(
+    x = "Bootstrap mean (swc)",
+    y = "Count",
+    title = "Bootstrap distribution (random sample)",
+    subtitle = "Dashed = sample mean; Solid = population mean"
+  )
+```
+
+**Prompt (3–4 sentences):** Is the bootstrap distribution centered near the population mean?  
+What does the bootstrap SD represent here?
+
+> *Write your answer here.*
+
+---
+
+## Exercise 2 — Non-random sample (summer-only) → bootstrap distribution (bias example)
+
+**Task:** Create a **summer-only** sample (Jun–Aug) of size `n = 200` and bootstrap the mean.
+
+> This simulates a field campaign that only measured during summer.
+
+```{r ex2_summer_sample, echo=TRUE, eval=FALSE}
+# GOAL: Build a summer-only pool of SWC observations (Jun–Aug), then sample from that pool.
+
+# TODO: ensure df has a month column.
+# If you do not already have `month`, create it from a date column as in Part I.
+# HINT: month(date, label = TRUE, abbr = TRUE)
+
+df_summer <- df %>%
+  filter(___ %in% c("Jun", "Jul", "Aug")) %>%
+  filter(!is.na(___))
+
+swc_summer_pool <- df_summer$swc
+
+length(swc_summer_pool)
+```
+
+```{r ex2_summer_bootstrap, echo=TRUE, eval=FALSE}
+set.seed(480)
+
+n_samp <- 200
+B <- 4000
+
+# 1) Draw a summer-only sample
+swc_samp_summer <- sample(___, size = n_samp, replace = FALSE)
+
+# 2) Bootstrap the mean from that sample
+boot_means_summer <- ___(
+  B,
+  mean(sample(___, size = n_samp, replace = TRUE))
+)
+
+# 3) Summarize
+tibble(
+  pop_mean = pop_mean_swc,
+  summer_pool_mean = mean(swc_summer_pool),
+  sample_mean = mean(swc_samp_summer),
+  boot_sd = sd(boot_means_summer)
+)
+```
+
+```{r ex2_plot_summer_boot, echo=TRUE, eval=FALSE}
+# GOAL: Plot summer bootstrap and compare to population mean.
+
+tibble(boot_mean = boot_means_summer) %>%
+  ggplot(aes(x = boot_mean)) +
+  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_vline(xintercept = mean(swc_samp_summer), linetype = "dashed", linewidth = 1.1) +
+  geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
+  theme_classic(base_size = 18) +
+  labs(
+    x = "Bootstrap mean (swc)",
+    y = "Count",
+    title = "Bootstrap distribution (summer-only sample)",
+    subtitle = "Dashed = sample mean; Solid = population mean"
+  )
+```
+
+**Prompt (4–6 sentences):** Does the bootstrap distribution look “confident” (narrow) even if it’s centered far from the population mean?  
+Explain the difference between **precision** and **accuracy** in this example.  
+What *kind* of error is summer-only sampling introducing?
+
+> *Write your answer here.*
+
+---
+
+## Exercise 3 — Stratified sampling (by month) → bootstrap distribution
+
+**Task:** Build a **month-stratified** sample that takes the same number of observations per month.
+
+This is one way to make your sample more representative when the population has strong seasonality.
+
+```{r ex3_stratified_sample, echo=TRUE, eval=FALSE}
+set.seed(480)
+
+n_samp <- 240  # divisible by 12 makes this easy (20 per month)
+k_per_month <- n_samp / 12
+
+# 1) Create a month-stratified sample from df
+df_strat <- df %>%
+  filter(!is.na(___)) %>%
+  group_by(___) %>%
+  slice_sample(n = ___) %>%
+  ungroup()
+
+swc_samp_strat <- df_strat$swc
+
+# CHECK:
+df_strat %>% count(month)
+```
+
+```{r ex3_strat_bootstrap, echo=TRUE, eval=FALSE}
+set.seed(480)
+
+B <- 4000
+
+boot_means_strat <- replicate(
+  B,
+  mean(sample(swc_samp_strat, size = length(swc_samp_strat), replace = TRUE))
+)
+
+tibble(
+  pop_mean = pop_mean_swc,
+  sample_mean = mean(swc_samp_strat),
+  boot_sd = sd(boot_means_strat)
+)
+```
+
+```{r ex3_plot_strat_boot, echo=TRUE, eval=FALSE}
+# GOAL: Plot stratified bootstrap and compare to population mean.
+
+tibble(boot_mean = boot_means_strat) %>%
+  ggplot(aes(x = boot_mean)) +
+  geom_histogram(bins = ___, alpha = 0.85) +
+  geom_vline(xintercept = mean(swc_samp_strat), linetype = "dashed", linewidth = 1.1) +
+  geom_vline(xintercept = pop_mean_swc, linetype = "solid", linewidth = 1.1) +
+  theme_classic(base_size = 18) +
+  labs(
+    x = "Bootstrap mean (swc)",
+    y = "Count",
+    title = "Bootstrap distribution (month-stratified sample)",
+    subtitle = "Dashed = sample mean; Solid = population mean"
+  )
+```
+
+**Prompt (4–6 sentences):** Compare the centers and spreads of the three bootstrap distributions (random vs summer-only vs stratified).  
+Which sampling design is most accurate for the annual mean? Which looks most precise?  
+What does this teach you about bootstrap and study design?
+
+> *Write your answer here.*
+
+---
+
+# Part II wrap-up
+
+**One sentence to remember:**
+
+> Bootstrap measures uncertainty around your estimate, **given your sample** — it cannot rescue a biased sample.
 
 
+---
 
 # Submission
 
