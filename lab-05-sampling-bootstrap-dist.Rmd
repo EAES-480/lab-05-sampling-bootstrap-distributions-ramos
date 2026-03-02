@@ -146,7 +146,7 @@ pop
 
 **Prompt (2–3 sentences):** Which variable has the largest population SD? What does that imply about the variability of that process?
 
-> *Write your answer here.*
+> *le has the largest SD, this implies that the processes that drives le have higher variability compared to fc and gpp*
 
 ---
 
@@ -197,7 +197,7 @@ relerr
 **Prompt (3–4 sentences):** Which variable had the largest relative error at your chosen `n_samp`?  
 Give a scientific reason why some variables are harder to estimate from a small sample.
 
-> *Write your answer here.*
+> *Variables with a high population SD relative to their mean are mathematically harder to estimate. In this case viability is given by seasonality, because random chance might select extreme values, moving the sample mean.*
 
 ---
 
@@ -285,7 +285,7 @@ p_relerr
 **Prompt (3–4 sentences):** Describe the pattern. Is improvement from n=25→100 larger than 300→1000?  
 Why does accuracy show “diminishing returns” as n increases?
 
-> *Write your answer here.*
+> *Relative error decreases as n increases. The improvement from 25 to 100 is much larger than from 300 to 1000 because the median relative error drops dramatically at lower sample sizes. Accuracy shows diminishing returns because the SE shrinks proportionally to the square root of the sample size.*
 
 ---
 
@@ -351,7 +351,7 @@ tibble(mean_est = means) %>%
 **Prompt (3–5 sentences):** How close were `se_theory` and `se_simulated`?  
 What changes if you increase `n_samp` vs increase `reps`?
 
-> *Write your answer here.*
+> *Increasing n will narrow the distribution and decrease the relative error. Increasing reps creates a more complete approximate sampling distribution*
 
 ---
 
@@ -414,7 +414,7 @@ tibble(boot_means) %>%
 **Prompt (4–6 sentences):** Compare the bootstrap distribution to the sampling distribution from Part III.  
 What is the bootstrap trying to approximate? When is bootstrap especially useful in EAES?
 
-> *Write your answer here.*
+> *The bootstrap distribution and the sampling distribution share a similar bell shape, but the bootstrap distribution is centered around the sample mean instead of the population mean. The bootstrap is trying to approximate the uncertainty. This is especially useful in EaES because we almost never observe an entire population and rarely have the resources to repeat a full field campaign to gather multiple distinct samples.*
 
 ---
 
@@ -499,7 +499,7 @@ tibble(boot_mean = boot_means_random) %>%
 **Prompt (3–4 sentences):** Is the bootstrap distribution centered near the population mean?  
 What does the bootstrap SD represent here?
 
-> *Write your answer here.*
+> *Yes, the bootstrap SD represents the standard error of the sample mean, estimating how much we expect our sample mean to fluctuate due to random sampling.*
 
 ---
 
@@ -570,7 +570,7 @@ tibble(boot_mean = boot_means_summer) %>%
 Explain the difference between **precision** and **accuracy** in this example.  
 What *kind* of error is summer-only sampling introducing?
 
-> *Write your answer here.*
+> *Yes, the bootstrap distribution looks very narrow and "confident," despite being centered. Precision is represented by the narrow spread of the bootstrap distribution, while accuracy is how close the estimate is to the true population value. Summer-only sampling introduces systematic bias.*
 
 ---
 
@@ -637,7 +637,7 @@ tibble(boot_mean = boot_means_strat) %>%
 Which sampling design is most accurate for the annual mean? Which looks most precise?  
 What does this teach you about bootstrap and study design?
 
-> *Write your answer here.*
+> *The random and stratified bootstrap distributions are centered accurately near the true population mean, whereas the summer-only distribution is centered far off. The stratified sampling design is the most accurate for estimating the annual mean because it guarantees observations across all seasons, overcoming strong seasonality. This teaches us that the bootstrap measures uncertainty around your estimate given the specific sample you observed, but it cannot correct a biased study design.*
 
 ---
 

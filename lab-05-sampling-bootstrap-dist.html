@@ -11,7 +11,7 @@
 
 <meta name="author" content="EAES 480 — Modern Statistics in Earth &amp; Environmental Science" />
 
-<meta name="date" content="2026-02-25" />
+<meta name="date" content="2026-03-02" />
 
 <title>Lab 05 — Sampling and Bootstrap Distributions</title>
 
@@ -2940,7 +2940,7 @@ border-radius: 0px;
 Distributions</h1>
 <h4 class="author">EAES 480 — Modern Statistics in Earth &amp;
 Environmental Science</h4>
-<h4 class="date">February 25, 2026</h4>
+<h4 class="date">March 02, 2026</h4>
 
 </div>
 
@@ -3091,7 +3091,8 @@ variable (e.g., <code>ta</code>, <code>le</code>).</p>
 largest population SD? What does that imply about the variability of
 that process?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>le has the largest SD, this implies that the processes that
+drives le have higher variability compared to fc and gpp</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3143,7 +3144,10 @@ largest relative error at your chosen <code>n_samp</code>?<br />
 Give a scientific reason why some variables are harder to estimate from
 a small sample.</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>Variables with a high population SD relative to their mean are
+mathematically harder to estimate. In this case viability is given by
+seasonality, because random chance might select extreme values, moving
+the sample mean.</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3243,7 +3247,11 @@ n”.</li>
 improvement from n=25→100 larger than 300→1000?<br />
 Why does accuracy show “diminishing returns” as n increases?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>Relative error decreases as n increases. The improvement from 25
+to 100 is much larger than from 300 to 1000 because the median relative
+error drops dramatically at lower sample sizes. Accuracy shows
+diminishing returns because the SE shrinks proportionally to the square
+root of the sample size.</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3309,7 +3317,9 @@ replications)</p>
 What changes if you increase <code>n_samp</code> vs increase
 <code>reps</code>?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>Increasing n will narrow the distribution and decrease the
+relative error. Increasing reps creates a more complete approximate
+sampling distribution</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3378,7 +3388,13 @@ distribution to the sampling distribution from Part III.<br />
 What is the bootstrap trying to approximate? When is bootstrap
 especially useful in EAES?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>The bootstrap distribution and the sampling distribution share a
+similar bell shape, but the bootstrap distribution is centered around
+the sample mean instead of the population mean. The bootstrap is trying
+to approximate the uncertainty. This is especially useful in EaES
+because we almost never observe an entire population and rarely have the
+resources to repeat a full field campaign to gather multiple distinct
+samples.</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3473,7 +3489,9 @@ mean.</p>
 distribution centered near the population mean?<br />
 What does the bootstrap SD represent here?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>Yes, the bootstrap SD represents the standard error of the sample
+mean, estimating how much we expect our sample mean to fluctuate due to
+random sampling.</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3547,7 +3565,11 @@ Explain the difference between <strong>precision</strong> and
 <strong>accuracy</strong> in this example.<br />
 What <em>kind</em> of error is summer-only sampling introducing?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>Yes, the bootstrap distribution looks very narrow and
+“confident,” despite being centered. Precision is represented by the
+narrow spread of the bootstrap distribution, while accuracy is how close
+the estimate is to the true population value. Summer-only sampling
+introduces systematic bias.</em></p>
 </blockquote>
 <hr />
 </div>
@@ -3609,7 +3631,14 @@ Which sampling design is most accurate for the annual mean? Which looks
 most precise?<br />
 What does this teach you about bootstrap and study design?</p>
 <blockquote>
-<p><em>Write your answer here.</em></p>
+<p><em>The random and stratified bootstrap distributions are centered
+accurately near the true population mean, whereas the summer-only
+distribution is centered far off. The stratified sampling design is the
+most accurate for estimating the annual mean because it guarantees
+observations across all seasons, overcoming strong seasonality. This
+teaches us that the bootstrap measures uncertainty around your estimate
+given the specific sample you observed, but it cannot correct a biased
+study design.</em></p>
 </blockquote>
 <hr />
 </div>
