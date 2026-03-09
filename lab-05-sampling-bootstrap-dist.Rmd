@@ -654,3 +654,121 @@ What does this teach you about bootstrap and study design?
 
 - Knit your `.Rmd` to HTML.
 - Commit and push both the `.Rmd` to your GitHub repo.
+
+---
+
+# Part III — Estimating 95% Confidence Intervals with Bootstrap
+
+In this section you will use the bootstrap distributions you learned to create **95% confidence intervals**.
+
+Recall:
+
+A 95% bootstrap confidence interval can be estimated using the **2.5% and 97.5% quantiles** of the bootstrap distribution.
+
+## Exercise 1 — 95% CI for the Mean (SWC)
+
+Using the **random SWC sample from earlier**, compute a **95% bootstrap confidence interval for the mean**.
+
+```{r ex1_boot_ci_mean, echo=TRUE, eval=FALSE}
+# GOAL: compute the 2.5% and 97.5% quantiles of the bootstrap distribution
+
+quantile(boot_means_random, probs = c(___, ___))
+```
+
+**Prompt:**
+
+Does the confidence interval contain the **true population mean (`pop_mean_swc`)**?  
+What does this tell you about the uncertainty of the estimate?
+
+---
+
+## Exercise 2 — Visualizing the Confidence Interval
+
+Modify the bootstrap histogram from Part II so that the **95% CI is shown on the plot**.
+
+```{r ex2_plot_ci, echo=TRUE, eval=FALSE}
+boot_ci <- quantile(boot_means_random, probs = c(0.025, 0.975))
+
+tibble(boot_mean = boot_means_random) %>%
+  ggplot(aes(x = boot_mean)) +
+  geom_histogram(bins = 50, alpha = 0.8) +
+  geom_vline(xintercept = boot_ci, color = "red", linewidth = 1.1) +
+  geom_vline(xintercept = mean(swc_samp_random), linetype = "dashed") +
+  theme_classic(base_size = 18)
+```
+
+**Prompt:**
+
+Explain what the **red vertical lines** represent.
+
+---
+
+## Exercise 3 — Confidence Intervals for a Linear Model
+
+Choose:
+
+- one **response variable**
+- one **predictor variable**
+
+from the dataset.
+
+Examples:
+
+- `swc ~ ta`
+- `swc ~ le`
+- `gpp ~ ta`
+
+```{r ex3_fit_model, echo=TRUE, eval=FALSE}
+>> df_sample <- df %>% slice_sample(n = 1000, replace = FALSE)
+
+response_var <- "___"
+predictor_var <- "___"
+
+model <- lm(df[[response_var]] ~ df[[predictor_var]])
+
+coef(model)
+```
+
+### Bootstrap the regression
+
+```{r ex3_bootstrap_lm, echo=TRUE, eval=FALSE}
+set.seed(480)
+
+B <- 2000
+
+boot_coef <- replicate(B, {
+
+  samp_rows <- df_sample %>% slice_sample(n = nrow(df_sample), replace = TRUE)
+
+  fit <- lm(
+    samp_rows[[response_var]] ~ samp_rows[[predictor_var]]
+  )
+
+  coef(fit)
+
+})
+
+boot_coef <- t(boot_coef)
+boot_coef
+```
+
+### Compute confidence intervals
+
+```{r ex3_ci_params, echo=TRUE, eval=FALSE}
+quantile(boot_coef[,1], probs = c(0.025, 0.975))  # intercept CI
+quantile(boot_coef[,2], probs = c(0.025, 0.975))  # slope CI
+```
+
+**Prompt:**
+
+Interpret the slope confidence interval.
+
+- Does it include zero?
+- What does that imply about the relationship between the predictor and response variable?
+
+---
+
+# Submission
+
+- Knit your `.Rmd` to HTML.
+- Commit and push both the `.Rmd` to your GitHub repo.

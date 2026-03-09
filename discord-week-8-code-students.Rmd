@@ -1,0 +1,105 @@
+---
+title: "Discord Assignment - Week 8: Interpreting Slope Uncertainty"
+author: "EAES 480 — Modern Statistics in Earth & Environmental Science"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: cosmo
+    highlight: tango
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Instructions
+
+Please use the code chunks below to:  
+
+1) load and clean
+2) select two variables
+3) bootstrap fit a linear model
+4) calculate the 95% confidence interval of the slope coefficient
+
+For your Discord post, please include a statement on:
+
+	1.	your process (one sentence),
+	2.	fitted slope + 95% bootstrap CI,
+	3.	evaluate whether slope CI includes 0?
+	4.	**if your CI includes 0** one reason the linear model might break (nonlinearity, confounding, diurnal structure, etc.).
+	
+---
+
+# Data
+
+## Load the `US-AMS` dataset, clean names, filter for a few days in Spring 2023
+
+```{r load_data, echo=TRUE, eval=FALSE}
+# GOAL: Read the CSV from the repo and clean column names.
+# TODO: finish this pipeline.
+
+df <- read_csv("data/us-ams-simple.csv", na = c("-9999")) %>%
+  clean_names() %>%
+  filter(year_local == 2023 & doy > 120 & doy < 180)
+
+glimpse(df)
+```
+
+# Pick two variables
+
+## Unlike labs, neither needs to be a flux variable (`fc`, `fch4`, `gpp`, `reco`)
+
+```{r choose_vars, echo=TRUE, eval=FALSE}
+response_var <- c(
+  "___"  # e.g., "fc"
+)
+predictor_var <- c(
+    "___"  # e.g., "ta"
+)
+```
+
+# Bootstrap fit a linear model between the two variables
+
+```{r ex3_bootstrap_lm, echo=TRUE, eval=FALSE}
+# fix to create smaller sample dataset
+df <- df %>% slice_sample(n = 1000, replace = FALSE)
+
+set.seed(480)
+
+B <- 2000
+
+boot_coef <- replicate(B, {
+
+  samp_rows <- df %>% slice_sample(n = nrow(df), replace = TRUE)
+
+  fit <- lm(
+    samp_rows[[response_var]] ~ samp_rows[[predictor_var]]
+  )
+
+  coef(fit)
+
+})
+
+boot_coef <- t(boot_coef)
+```
+
+# Evaluate the CI slope range
+
+```{r ex3_ci_params, echo=TRUE, eval=FALSE}
+quantile(boot_coef[,2], probs = c(0.025, 0.975))  # slope CI
+```
+
